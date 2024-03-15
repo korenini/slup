@@ -10,9 +10,14 @@ def run_update(auth, records):
     confd = {}
     confd.update(auth)
     confd.update(records)
-    r = requests.get('https://dnsup.sitelutions.com/dnsup', params=confd)
-    if r.text.strip() != 'success':
-        print("Encountered an error. API responded with [{}]".format(r.text.strip()))
+    try:
+        r = requests.get('https://dnsup.sitelutions.com/dnsup', params=confd)
+        status = r.text.strip().split("\n")
+        for s in status:
+            if s != 'success':
+                print(f"Encountered an error. API responded with [{s}]")
+    except ConnectionError, ConnectTimeout:
+        print("Encountered a problem. Could not connect.")
 
 def get_config(filename):
     config = configparser.ConfigParser()
